@@ -30,12 +30,7 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
   addImages(XFile image) {
     setState(() {
       imageFiles.add(image);
-      _animationController = AnimationController(
-          vsync: this, duration: const Duration(milliseconds: 1500));
-      animation = Tween<double>(begin: 400, end: 1).animate(scaleAnimation =
-          CurvedAnimation(
-              parent: _animationController, curve: Curves.elasticOut))
-        ..addListener(() {});
+      _animationController.reset(); // Reset before starting new animation
       _animationController.forward();
     });
   }
@@ -87,6 +82,14 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
   void initState() {
     _initCamera();
     _currIndex = 0;
+
+     _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+    animation = Tween<double>(begin: 400, end: 1).animate(scaleAnimation =
+        CurvedAnimation(parent: _animationController, curve: Curves.elasticOut))
+      ..addListener(() {});
 
     super.initState();
   }
@@ -348,6 +351,7 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
                       imageList.add(
                           MediaModel.blob(file, "", file.readAsBytesSync()));
                     }
+                    
                     Navigator.pop(context, imageList);
                   },
                   child: Padding(
@@ -367,12 +371,8 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    if (_controller != null) {
-      _controller!.dispose();
-    } else {
-      _animationController.dispose();
-    }
-
+    _animationController.dispose(); // Dispose _animationController
+    _controller?.dispose(); // Dispose _controller
     super.dispose();
   }
 }
